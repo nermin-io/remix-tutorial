@@ -1,6 +1,5 @@
 import {
   Form,
-  Link,
   Links,
   LiveReload,
   Meta,
@@ -11,7 +10,12 @@ import {
   useLoaderData,
   useNavigation,
 } from "@remix-run/react";
-import { type LinksFunction, json, redirect } from "@remix-run/node";
+import {
+  type LinksFunction,
+  json,
+  redirect,
+  LoaderFunctionArgs,
+} from "@remix-run/node";
 
 import appStylesHref from "./app.css";
 import { createEmptyContact, getContacts } from "~/data";
@@ -20,8 +24,10 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
 ];
 
-export async function loader() {
-  const contacts = await getContacts();
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+  const q = url.searchParams.get("q");
+  const contacts = await getContacts(q);
   return json({ contacts });
 }
 
